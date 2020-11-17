@@ -2,7 +2,6 @@
 
 Balloon::Balloon(glm::vec3 color)
 {
-	balloonColor = color;
 	{
 		balloon_circle = new Mesh("balloon_circle");
 		std::vector<VertexFormat> vertices;
@@ -14,7 +13,7 @@ Balloon::Balloon(glm::vec3 color)
 		{
 			arg = 6.28318530718f * i / 50;
 
-			vertices.emplace_back(glm::vec3(cos(arg), sin(arg), 0), glm::vec3(1.f, 1.f, 0.f));
+			vertices.emplace_back(glm::vec3(cos(arg), sin(arg), 0), color);
 			indices.push_back(i);
 		}
 		indices.push_back(50);
@@ -54,8 +53,4 @@ Mesh* Balloon::GetBallon(){
 }
 Mesh* Balloon::GetBallon_Line(){
 	return balloon_line;
-}
-
-glm::vec3 Balloon::GetBalloonColor() {
-	return balloonColor;
 }

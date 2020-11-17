@@ -41,12 +41,14 @@ protected:
 	Rectangle_bar* rectangle_speed_arrow;
 	Rectangle_bar* rectangle_score;
 	Shuriken* shuriken;
-	Balloon* balloons;
+	Balloon* balloons_yellow;
+	Balloon* balloons_red;
 	Balloon* player_lives_draw;
 	glm::mat3 modelMatrix;
 	float translateX_player, translateY_player;
 	float translateX_arrow, translateY_arrow;
 	float translateX_shuriken, translateY_shuriken;
+	float translateX_ballon, translateY_ballon;
 	float scaleX, scaleY;
 	float angularStep;
 	float angularStep_arrow;
@@ -60,6 +62,9 @@ protected:
 	glm::ivec2 arrow_coord;
 	glm::ivec2 arch_coord;
 	glm::ivec2 resolution;
-	glm::ivec2 collision_balloon;
-	glm::ivec2 collision_arch;
+	glm::ivec2 balloon;
+	glm::ivec2 balloon_red;
+	//std::vector<float> translateY_arrow_vec;
+	float translateY_arrow_vec[5];
+	float translateY_arrow_vec_red[5];
 };

@@ -58,8 +58,15 @@ void Tema1::Init()
 	rectangle_speed_arrow = new Rectangle_bar();
 	rectangle_score = new Rectangle_bar();
 	shuriken = new Shuriken();
-	balloons = new Balloon(glm::vec3(1.f, 1.f, 1.f));
+	balloons_yellow = new Balloon(glm::vec3(0.8f, 0.9f, 0.1f));
+	balloons_red = new Balloon(glm::vec3(0.6f, 0.f, 0.f));
 	player_lives_draw = new Balloon(glm::vec3(0.8f, 0.4f, 0.f));
+	for (int i = 0; i < 5; i++) {
+		translateY_arrow_vec[i] = -150 *i;
+	}
+	for (int i = 0; i < 5; i++) {
+		translateY_arrow_vec_red[i] = -250 * i;
+	}
 }
 
 bool Tema1::IsCollisionPointCircle(float pointX, float pointY, float circleX, float circleY, float circleRadius) {
@@ -118,47 +125,73 @@ void Tema1::Update(float deltaTimeSeconds)
 
 	if(arrow_coord.x > resolution.x){
 		translateX_arrow = 0;
+		translateY_arrow = 0;
 		mouse_released = false;
 		mouse_pressed = false;
+		hold_time_mouse = 0;
 	}
 
 	arrow_coord.x = 150 ;
 	arrow_coord.y = resolution.y / 2;
-	//if (mouse_pressed == false) {
-	//	arrow_coord.y = resolution.y / 2;
-	//	translateY_arrow = 0;
-	//}
-	//else {
-	//	arrow_coord.y = resolution.y / 2;
-	//	/*arrow_coord.y += cos(1.57 - angularStep_arrow) * 30;*/
-	//	cout << translateY_arrow<<endl;
-	//}
 	
+
 	modelMatrix = Transform2D::Translate(arrow_coord.x + translateX_arrow, arrow_coord.y + translateY_player + translateY_arrow) * Transform2D::Rotate(angularStep_arrow) * Transform2D::Scale(30, 30);
 	RenderMesh2D(archer->GetArrow(), shaders["VertexColor"], modelMatrix);
 	
-	arrow_coord.x += translateX_arrow;
-
-	if (IsCollisionPointCircle((arrow_coord.x+60), (arrow_coord.y - 30), 580.f, (resolution.y / 2 - 25), 50) == true) {
-		player_score++;
-		modelMatrix = Transform2D::Translate(600, resolution.y / 2 - 25) * Transform2D::Scale(50, 100) * Transform2D::Scale(0, 0);
-		RenderMesh2D(balloons->GetBallon(), shaders["VertexColor"], modelMatrix);
-
-		modelMatrix = Transform2D::Translate(580, resolution.y / 2 - 150) * Transform2D::Scale(25, 25) * Transform2D::Scale(0, 0);
-		RenderMesh2D(balloons->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
-	}
-	else {
-		modelMatrix = Transform2D::Translate(600, resolution.y / 2 - 25) * Transform2D::Scale(50, 100);
-		RenderMesh2D(balloons->GetBallon(), shaders["VertexColor"], modelMatrix);
-
-		modelMatrix = Transform2D::Translate(580, resolution.y / 2 - 150) * Transform2D::Scale(25, 25);
-		RenderMesh2D(balloons->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
-	}
 	
+	arrow_coord.x += translateX_arrow;
+	balloon_red.x = 900;
+	for (int i = 0; i < 5; i++) {
+		translateY_arrow_vec_red[i] += deltaTimeSeconds * 100;
+		if (translateY_arrow_vec_red[i] > resolution.y) {
+			translateY_arrow_vec_red[i] = 0;
+		}
+		if (IsCollisionPointCircle((arrow_coord.x + 60), (arrow_coord.y - 30), balloon_red.x - 75*i, translateY_arrow_vec_red[i], 100) == true) {
+			player_score--;
+			translateY_arrow_vec_red[i] = 0;
+			modelMatrix = Transform2D::Translate(balloon_red.x - 100 * i+100, translateY_arrow_vec_red[i]) * Transform2D::Scale(0, 0);
+			RenderMesh2D(balloons_red->GetBallon(), shaders["VertexColor"], modelMatrix);
+
+			modelMatrix = Transform2D::Translate(balloon_red.x - 100 * i+100, translateY_arrow_vec_red[i] - 125) * Transform2D::Scale(0, 0);
+			RenderMesh2D(balloons_red->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
+		}
+		else {
+			modelMatrix = Transform2D::Translate(balloon_red.x - 100 * i + 100, translateY_arrow_vec_red[i]) * Transform2D::Scale(50, 100);
+			RenderMesh2D(balloons_red->GetBallon(), shaders["VertexColor"], modelMatrix);
+
+			modelMatrix = Transform2D::Translate(balloon_red.x - 100 * i + 100, translateY_arrow_vec_red[i] - 125) * Transform2D::Scale(25, 25) ;
+			RenderMesh2D(balloons_red->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
+		}
+	}
+
+	balloon.x = 500;
+
+	for (int i = 0; i < 5; i++) {
+		translateY_arrow_vec[i] += deltaTimeSeconds * 100;
+		if (translateY_arrow_vec[i] > resolution.y) {
+			translateY_arrow_vec[i] = 0;
+		}
+		if (IsCollisionPointCircle((arrow_coord.x + 60), (arrow_coord.y - 30), balloon.x + 100 * i, translateY_arrow_vec[i], 100) == true) {
+			translateY_arrow_vec[i] = 0;
+			player_score++;
+			modelMatrix = Transform2D::Translate(balloon.x + 100 * i, translateY_arrow_vec[i]) * Transform2D::Scale(0, 0);
+			RenderMesh2D(balloons_yellow->GetBallon(), shaders["VertexColor"], modelMatrix);
+
+			modelMatrix = Transform2D::Translate(balloon.x + 100 * i - 25, translateY_arrow_vec[i]- 125) * Transform2D::Scale(0, 0);
+			RenderMesh2D(balloons_yellow->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
+		}
+		else {
+			
+			modelMatrix = Transform2D::Translate(balloon.x + 100 * i, translateY_arrow_vec[i]) * Transform2D::Scale(50, 100);
+			RenderMesh2D(balloons_yellow->GetBallon(), shaders["VertexColor"], modelMatrix);
+
+			modelMatrix = Transform2D::Translate(balloon.x + 100 * i -25, translateY_arrow_vec[i] - 125) * Transform2D::Scale(25, 25);
+			RenderMesh2D(balloons_yellow->GetBallon_Line(), shaders["VertexColor"], modelMatrix);
+		}
+	}
+
 	angularStep_shuriken += deltaTimeSeconds * 1000;
 	translateX_shuriken -= deltaTimeSeconds * 50;
-
-	
 
 	if (IsCollisionCircleCircle((700 + translateX_shuriken), (resolution.y / 2), 50, ((resolution.y / 2) + translateY_player), 25, 50) && translateX_shuriken > -576) {
 		player_lives--;
@@ -167,11 +200,11 @@ void Tema1::Update(float deltaTimeSeconds)
 
 	if (IsCollisionPointCircle((arrow_coord.x + 60), (arrow_coord.y - 30), (700 + translateX_shuriken), (resolution.y / 2), 40)) {
 		cout << "hei" <<endl;
-		modelMatrix = Transform2D::Translate(700, resolution.y / 2) * Transform2D::Translate(translateX_shuriken, 0) * Transform2D::Scale(0, 0) * Transform2D::Rotate(angularStep_shuriken);
+		modelMatrix = Transform2D::Translate(700 + translateX_shuriken, resolution.y / 2)  * Transform2D::Scale(0, 0) * Transform2D::Rotate(angularStep_shuriken);
 		RenderMesh2D(shuriken->GetShuriken(), shaders["VertexColor"], modelMatrix);
 	}
 	else {
-		modelMatrix = Transform2D::Translate(700, resolution.y / 2) * Transform2D::Translate(translateX_shuriken, 0) * Transform2D::Scale(50, 50) * Transform2D::Rotate(angularStep_shuriken);
+		modelMatrix = Transform2D::Translate(700 + translateX_shuriken, resolution.y / 2)  * Transform2D::Scale(50, 50) * Transform2D::Rotate(angularStep_shuriken);
 		RenderMesh2D(shuriken->GetShuriken(), shaders["VertexColor"], modelMatrix);
 	}
 
@@ -222,6 +255,7 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
 		translateX_arrow += hold_time_mouse * cos(angularStep_arrow);
 		translateY_arrow -= hold_time_mouse * sin(angularStep_arrow);
 	}
+
 }
 
 void Tema1::OnKeyPress(int key, int mods)
